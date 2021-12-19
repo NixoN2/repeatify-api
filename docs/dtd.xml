@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ISSPECS SYSTEM "ISSpecs.dtd">
+
+<ISSPECS>
+    <DESCRIPTION>
+        <TITLE>
+            Repeatify
+        </TITLE>
+        <SUBJ>
+            Приложение для отображения материала через коллекции карточек
+        </SUBJ>
+    </DESCRIPTION>
+
+    <DATA>
+        <ENTITY ent_id="User">
+            <PROPERTY>id</PROPERTY>
+            <PROPERTY>email</PROPERTY>
+            <PROPERTY>first name</PROPERTY>
+            <PROPERTY>last name</PROPERTY>
+            <PROPERTY>password</PROPERTY>
+            <PROPERTY>animal</PROPERTY>
+            <PROPERTY>color</PROPERTY>
+            <PROPERTY>role</PROPERTY>
+            <PROPERTY>createdAt</PROPERTY>
+            <PROPERTY>updatedAt</PROPERTY>
+        </ENTITY>
+        <ENTITY ent_id="Collection">
+            <PROPERTY>id</PROPERTY>
+            <PROPERTY>userId</PROPERTY>
+            <PROPERTY>private</PROPERTY>
+            <PROPERTY>name</PROPERTY>
+            <PROPERTY>createdAt</PROPERTY>
+            <PROPERTY>updatedAt</PROPERTY>
+        </ENTITY>
+        <ENTITY ent_id="Card">
+            <PROPERTY>id</PROPERTY>
+            <PROPERTY>name</PROPERTY>
+            <PROPERTY>material</PROPERTY>
+            <PROPERTY>collectionId</PROPERTY>
+            <PROPERTY>createdAt</PROPERTY>
+            <PROPERTY>updatedAt</PROPERTY>
+        </ENTITY>
+        <ENTITY ent_id="Editor">
+            <PROPERTY>id</PROPERTY>
+            <PROPERTY>userId</PROPERTY>
+            <PROPERTY>collectionId</PROPERTY>
+            <PROPERTY>createdAt</PROPERTY>
+            <PROPERTY>updatedAt</PROPERTY>
+        </ENTITY>
+        <RELATIONSHIP ent_ids="Collection User">
+            <PROPERTY>author</PROPERTY>
+            <PROPERTY>id</PROPERTY>
+        </RELATIONSHIP>
+        <RELATIONSHIP ent_ids="Card Collection">
+            <PROPERTY>collectionId</PROPERTY>
+            <PROPERTY>id</PROPERTY>
+        </RELATIONSHIP>
+        <RELATIONSHIP ent_ids="Editor Collection">
+            <PROPERTY>collectionId</PROPERTY>
+            <PROPERTY>id</PROPERTY>
+        </RELATIONSHIP>
+        <RELATIONSHIP ent_ids="Editor User">
+            <PROPERTY>userId</PROPERTY>
+            <PROPERTY>id</PROPERTY>
+        </RELATIONSHIP>
+        <CONSTRAINT>
+            User: {
+                id: NOT NULL PRIMARY KEY,
+                first_name: NOT NULL,
+                last_name: NOT NULL,
+                email: NOT NULL,
+                password: NOT NULL,
+                animal: NOT NULL,
+                color: NOT NULL,
+                role: NOT NULL,
+                createdAt: NOT NULL,
+                updatedAt: NOT NULL
+            },
+            Collection: {
+                id: NOT NULL PRIMARY KEY,
+                userId: NOT NULL REFERENCES User,
+                private: NOT NULL,
+                name: NOT NULL,
+                createdAt: NOT NULL,
+                updatedAt: NOT NULL
+            },
+            Card: {
+                id: NOT NULL PRIMARY KEY,
+                collectionId: NOT NULL REFERENCES Collection,
+                name: NOT NULL,
+                material: NOT NULL,
+                createdAt: NOT NULL
+                updatedAt: NOT NULL
+            },
+            Editor: {
+                id: NOT NULL PRIMARY KEY,
+                userId: NOT NULL REFERENCES User,
+                collectionId: NOT NULL REFERENCES Collection,
+                createdAt: NOT NULL,
+                updatedAt: NOT NULL
+            }
+        </CONSTRAINT>
+    </DATA>
+    <ROLES>
+        <ROLE>
+            <TITLE>Гость</TITLE>
+            <RESPONSIBILITY>Создать аккаунт, Перейти на страницу коллекции по ссылке, Перейти на страницу автора коллекции</RESPONSIBILITY>
+            <TOTALUSERS>1</TOTALUSERS>
+        </ROLE>
+        <ROLE>
+            <TITLE>Авторизованный пользователь</TITLE>
+            <RESPONSIBILITY>Всё, что может гость + Работать со своими коллекциями в роли автора и с чужими в роле редактора</RESPONSIBILITY>
+            <TOTALUSERS>1</TOTALUSERS>
+        </ROLE>
+        <ROLE>
+            <TITLE>Администратор</TITLE>
+            <RESPONSIBILITY>Всё, что может авторизованный пользователь + удалять пользователей и коллекции</RESPONSIBILITY>
+            <TOTALUSERS>1</TOTALUSERS>
+        </ROLE>
+    </ROLES>
+    <TECHSPEC>
+        <TYPE></TYPE>
+        <DEVTOOLS>
+            <DEV>Node js + Sequelize ORM Framework</DEV>
+        </DEVTOOLS>
+        <DBMS>
+            <TITLE>PostgreSQL</TITLE>
+            <VERSION>PostgreSQL 14</VERSION>
+            <REASONING></REASONING>
+        </DBMS>
+    </TECHSPEC>
+</ISSPECS>

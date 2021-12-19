@@ -1,0 +1,42 @@
+{
+    "test_user": {
+        "first_name": "Al",
+        "last_name": "Eg",
+        "role": "user",
+        "password": "skel",
+        "animal": "beaver",
+        "color": "#006CFE",
+        "email": "skes@skel.com",
+        "createdAt": "2021-11-13T09:51:03.426Z",
+        "updatedAt": "2021-11-13T10:34:17.875Z"
+    },
+    "test_admin": {
+        "first_name": "An",
+        "last_name": "Z",
+        "email": "an@gmail.com",
+        "password": "user",
+        "role": "admin",
+        "animal": "walrus",
+        "color": "#FF0044",
+        "createdAt": "2021-11-13T09:51:03.426Z",
+        "updatedAt": "2021-11-13T10:34:17.875Z"
+    },
+    "private_collection": {
+        "userId": 1,
+        "name": "collection",
+        "private": true
+    },
+    "card": {
+        "collectionId": 1,
+        "name": "cardname1",
+        "material": "text text text text"
+    },
+    "public_collection": {
+        "userId": 2,
+        "name": "collection",
+        "private": false
+    },
+    "editor": {
+        "email": "skes@skel.com"
+    }
+}

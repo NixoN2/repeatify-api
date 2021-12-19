@@ -1,0 +1,17 @@
+docker-compose up
+
+docker ps
+Берём $id контейнера n-app
+
+docker exec -it $id bash
+
+npx sequelize-cli db:drop
+npx sequelize-cli db:create
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
+
+node app.js
+
+Можно направлять запросы на localhost:3000
+
+Документацию можно найти на /api-docs
