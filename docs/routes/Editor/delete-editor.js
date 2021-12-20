@@ -15,6 +15,21 @@ module.exports = {
                 description: "Deleting editor"
             }
         ],
+        requestBody: {
+            content:{
+                'application/json': {
+                    schema:{
+                        type: "object",
+                        properties: {
+                            userId: {
+                                type: "number",
+                                example: 1
+                            }
+                        }
+                    }
+                }
+            }
+        },
         responses:{
             '200':{
                 description:"Editor was deleted"

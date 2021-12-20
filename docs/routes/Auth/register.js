@@ -9,13 +9,43 @@ module.exports = {
             content:{
                 'application/json': {
                     schema:{
-                        $ref:'#/components/schemas/User'
+                        type:'object',
+                        properties: {
+                            first_name: {
+                                type: "string",
+                                example: "string"
+                            },
+                            last_name: {
+                                type: "string",
+                                example: "string"
+                            },
+                            email: {
+                                type: "string",
+                                example: "string@string.com"
+                            },
+                            password: {
+                                type: "string",
+                                example: "string"
+                            },
+                            animal: {
+                                type: "string",
+                                example: "string"
+                            },
+                            color: {
+                                type: "string",
+                                example: "string"
+                            },
+                            role: {
+                                type: "string",
+                                example: "string"
+                            }
+                        }
                     }
                 }
             }
         },
         responses:{
-            '201':{
+            '201': {
                 description: "User created successfully",
                 content:{
                     'application/json':{
@@ -24,6 +54,9 @@ module.exports = {
                         }
                     }
                 }
+            },
+            '400': {
+                description: "wrong data format"
             },
             '500':{
                 description: 'Server error'

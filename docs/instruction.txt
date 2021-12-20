@@ -1,9 +1,8 @@
 docker-compose up
 
 docker ps
-Берём $id контейнера n-app
 
-docker exec -it $id bash
+docker exec -it n-app bash
 
 npx sequelize-cli db:drop
 npx sequelize-cli db:create
@@ -12,6 +11,5 @@ npx sequelize-cli db:seed:all
 
 node app.js
 
-Можно направлять запросы на localhost:3000
+Можно направлять запросы на localhost:5000, используя интерфейс swagger на localhost:5000/api-docs
 
-Документацию можно найти на /api-docs

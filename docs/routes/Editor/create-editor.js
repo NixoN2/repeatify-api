@@ -4,12 +4,29 @@ module.exports = {
         tags:['Editor'],
         description: "Create Editor",
         operationId: "createEditor",
-        parameters:[],
+        parameters:[
+            {
+                name:"id",
+                in:"path",
+                schema:{
+                    type: "string",
+                    example: "1"
+                },
+                required:true,
+                description: "A single collection id"
+            }
+        ],
         requestBody: {
             content:{
                 'application/json': {
                     schema:{
-                        $ref:'#/components/schemas/Editor'
+                        type:'object',
+                        properties:{
+                            email: {
+                                type: "string",
+                                example: "string@string.com"
+                            }
+                        }
                     }
                 }
             }

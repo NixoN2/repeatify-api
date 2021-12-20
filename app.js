@@ -53,41 +53,7 @@ app.use(express.json());
 // });
 
 // app.use(jwtCheck);
-// app.get('/check', guard.check(["read:collections"]), function (req, res) {
-//     res.json({ challenge1: 'This is the first challenge'});
-// });
-// const checkJwt = auth({
-//     audience: 'http://localhost:4000',
-//     issuerBaseURL: `https://nixonweb.eu.auth0.com/`,
-// });
-// function extractToken (req) {
-//     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-//         return req.headers.authorization.split(' ')[1];
-//     } else if (req.query && req.query.token) {
-//         return req.query.token;
-//     }
-//     return null;
-// }
 
-// const oAuth = async (req,res,next) => {
-//     const access_token = extractToken(req);
-//     const {data: user} = await axios.get("https://nixonweb.eu.auth0.com/userinfo", {headers: {Authorization: `Bearer ${access_token}`}});
-//     const exists = await User.findOne({
-//         where: {auth0Id: user.sub}
-//     });
-//     if (!exists) {
-//         await User.create(
-//             {
-//                 auth0Id: user.sub,
-//                 first_name: user.given_name,
-//                 last_name: user.family_name,
-//                 email: user.email,
-//                 picture: user.picture
-//             });
-//         return next();
-//     }
-//     return next();
-// }
 app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(docs));
 
 app.post("/register",async (req,res)=> {
@@ -99,7 +65,7 @@ app.post("/register",async (req,res)=> {
     try {
         const salt = await bcrypt.genSalt(10);
         const new_password = await bcrypt.hash(password, salt);
-        const user = await User.create({email,first_name,last_name,password: new_password,color,animal,role});
+        const user = await User.create({email: email.toLowerCase(),first_name,last_name,password: new_password,color,animal,role});
         return res.status(201).json(user);
     } catch (err) {
         return res.status(500).json(err);
@@ -110,13 +76,13 @@ app.post("/register",async (req,res)=> {
 app.post("/login", async (req,res)=> {
     const {email, password} = req.body;
     try {
-        const exists = await User.findOne({where: {email}});
+        const exists = await User.findOne({where: {email: email.toLowerCase()}});
         if (!exists) {
             return res.status(401).json({msg: `User with email ${email} doesn't exist`});
         }
-        const validPassword = await bcrypt.compare(password, user.password);
+        const validPassword = await bcrypt.compare(password, exists.password);
         if (!validPassword) {
-            res.status(400).json({ error: "Invalid Password" });
+            return res.status(403).json({ error: "Invalid Password" });
         }
         return res.status(200).json(exists);
     } catch (err) {
@@ -172,7 +138,7 @@ app.put("/users/:id",  async (req,res) => {
     }
 });
 
-app.delete("/users/:id", async (req,res) => {
+app.delete("/users/:id", (req,res,next) => checkAdmin(req,res,next),async (req,res) => {
     const id = req.params.id;
     try {
         const user = await User.findOne({where: {id}});
@@ -245,6 +211,9 @@ app.post("/collections",async (req,res) => {
     const {private,name, userId: id} = req.body;
     try {
         const user = await User.findOne({where: {id:id}});
+        if (!user){
+            return res.status(400).json({msg: "User doesn't exist"})
+        }
         const collection = await Collection.create({private, name, userId: user.id});
         return res.status(201).json(collection);
     } catch (err) {
@@ -271,10 +240,16 @@ app.put("/collections/:id",async (req, res) => {
     const {private,name} = req.body;
     try {
         const collection = await Collection.findOne({where:{id}, include: ['author','cards','editors']});
-        collection.private = private;
+        if (!collection){
+            return res.status(400).json({msg: "Collection doesn't exist"})
+        }
+        if (req.body.hasOwnProperty('private')){
+            collection.private = private;
+        }
         if (name){
             collection.name = name;
         }
+        await collection.save();
         return res.status(200).json(collection);
     } catch (err) {
         return res.status(500).json(err);
@@ -286,6 +261,13 @@ app.post("/editors/:id",async (req,res) => {
     const {email} = req.body;
     try {
         const user = await User.findOne({where: {email}});
+        const collection = await Collection.findOne({where: {id}});
+        if (!collection){
+            return res.status(400).json({msg: "Collection doesn't exist"})
+        }
+        if (!user){
+            return res.status(400).json({msg: "User doesn't exist"})
+        }
         const exists = await Editor.findOne({where: {collectionId: id, userId: user.id}});
         if (exists){
             return res.status(400).json({msg: "This user is already an editor of this collection"})
@@ -301,7 +283,18 @@ app.delete("/editors/:id", async (req,res) => {
     const id = req.params.id;
     const {userId} = req.body;
     try {
+        const user = await User.findOne({where:{id:userId}});
+        if (!user){
+            return res.status(400).json({msg: "User doesn't exist"})
+        }
+        const collection = await Collection.findOne({where: {id}});
+        if (!collection){
+            return res.status(400).json({msg: "Collection doesn't exist"})
+        }
         const editor = await Editor.findOne({where: {collectionId: id, userId: userId}});
+        if (!editor) {
+            return res.status(400).json({msg: "Editor doesn't exist"});
+        }
         await editor.destroy();
         return res.status(200).json({message: "Editor was deleted"});
     } catch (err) {
@@ -314,6 +307,9 @@ app.post("/card",async (req, res) => {
     const {collectionId, name, material} =  req.body;
     try {
         const collection = await Collection.findOne({where: {id: collectionId}});
+        if (!collection){
+            return res.status(400).json({msg: "Collection doesn't exist"})
+        }
         const card = await Card.create({name,material,collectionId:collection.id});
         return res.status(201).json(card);
     } catch (err) {
@@ -326,6 +322,9 @@ app.put("/card/:id", async (req, res) => {
     const {name, material} = req.body;
     try {
         const card = await Card.findOne({where: {id}});
+        if (!card){
+            return res.status(400).json({msg: "Card doesn't exist"})
+        }
         if (name) {
             card.name = name;
         }
@@ -343,6 +342,9 @@ app.delete("/card/:id",async (req, res) => {
     const id = req.params.id;
     try {
         const card = await Card.findOne({where: {id}});
+        if (!card){
+            return res.status(400).json({msg: "Card doesn't exist"})
+        }
         await card.destroy();
         return res.status(201).json({message: "Card was deleted"});
     } catch (err) {

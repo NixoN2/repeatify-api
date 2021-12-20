@@ -15,6 +15,29 @@ module.exports = {
                 description: "Id of user to be updated"
             }
         ],
+        requestBody: {
+            content:{
+                'application/json': {
+                    schema:{
+                        type:'object',
+                        properties: {
+                            first_name: {
+                                type: "string",
+                                example: "string"
+                            },
+                            last_name: {
+                                type: "string",
+                                example: "string"
+                            },
+                            email: {
+                                type: "string",
+                                example: "string@string.com"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         responses:{
             '200':{
                 description:"Updated User",

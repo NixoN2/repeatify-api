@@ -8,18 +8,33 @@ module.exports = {
                 name:"id",
                 in:"path",
                 schema:{
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string",
-                            example: "1"
-                        }
-                    }
+                    type: "string",
+                    example: "1"
+
                 },
                 required:true,
                 description: "Id of card to be updated"
             }
         ],
+        requestBody: {
+            content:{
+                'application/json': {
+                    schema:{
+                        type:'object',
+                        properties: {
+                            material:{
+                                type:'string',
+                                example:"text"
+                            },
+                            name:{
+                                type:"string",
+                                example: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         responses:{
             '200':{
                 description:"Updated card",

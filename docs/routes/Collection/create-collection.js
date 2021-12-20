@@ -9,7 +9,21 @@ module.exports = {
             content:{
                 'application/json': {
                     schema:{
-                        $ref:'#/components/schemas/Collection'
+                        type:'object',
+                        properties:{
+                            userId: {
+                                type: "number",
+                                example: 1
+                            },
+                            private:{
+                                type:'boolean',
+                                example:true
+                            },
+                            name:{
+                                type:"string",
+                                example: "string"
+                            }
+                        }
                     }
                 }
             }

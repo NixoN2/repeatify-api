@@ -15,6 +15,25 @@ module.exports = {
                 description: "Id of collection to be updated"
             }
         ],
+        requestBody: {
+            content:{
+                'application/json': {
+                    schema:{
+                        type:'object',
+                        properties: {
+                            private:{
+                                type:'boolean',
+                                example:true
+                            },
+                            name:{
+                                type:"string",
+                                example: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         responses:{
             '200':{
                 description:"Updated collection",
