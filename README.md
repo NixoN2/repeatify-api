@@ -9,11 +9,12 @@
 #### User поля:
 
 * Id - Integer(>= 0), Unique
-* Email - Varchar(200), Unique
-* First name - Varchar(200)
-* Last name - Varchar(200)
-* Password - Varchar(200) - password is stored encrypted
-* Role - Varchar(200)
+* Email - Varchar(255), Unique
+* First name - Varchar(255)
+* Last name - Varchar(255)
+* animal - Varchar(255)
+* Password - Varchar(255) - password is stored encrypted
+* Role - Varchar(255)
 
 #### Collection поля:
 * Author - Foreign key to User model
@@ -27,7 +28,7 @@
 * Name - Varchar(200)
 * Material - Text
 
-#### CollectionCard поля: 
+#### CollectionCard поля:
 * Id - Integer(>=0), Unique,
 * Collection - Foreign key to Collection model
 * Card - Foreign key to Card model
@@ -46,10 +47,10 @@
 #### Страница создания коллекции
 Возможность создать коллекцию через интерфейс веб-приложения. Добавить карточку и редактора коллекции.
 
-#### Профиль пользователя 
+#### Профиль пользователя
 Показан список коллекций пользователя, а также данные этого пользователя. Имя и фамилия могут быть изменены. Возможно выхода из профиля.
 
-#### Регистрация и авторизация 
+#### Регистрация и авторизация
 
 Необходимые пользователю поля:
 
