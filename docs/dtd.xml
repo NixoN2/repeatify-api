@@ -13,39 +13,31 @@
 
     <DATA>
         <ENTITY ent_id="User">
-            <PROPERTY>id</PROPERTY>
-            <PROPERTY>email</PROPERTY>
-            <PROPERTY>first name</PROPERTY>
-            <PROPERTY>last name</PROPERTY>
-            <PROPERTY>password</PROPERTY>
-            <PROPERTY>animal</PROPERTY>
-            <PROPERTY>color</PROPERTY>
-            <PROPERTY>role</PROPERTY>
-            <PROPERTY>createdAt</PROPERTY>
-            <PROPERTY>updatedAt</PROPERTY>
+            <PROPERTY>id: INTEGER</PROPERTY>
+            <PROPERTY>email: VARCHAR(255)</PROPERTY>
+            <PROPERTY>first name: VARCHAR(255)</PROPERTY>
+            <PROPERTY>last name: VARCHAR(255)</PROPERTY>
+            <PROPERTY>password: VARCHAR(255)</PROPERTY>
+            <PROPERTY>animal: VARCHAR(255)</PROPERTY>
+            <PROPERTY>color: VARCHAR(255)</PROPERTY>
+            <PROPERTY>role: VARCHAR(255)</PROPERTY>
         </ENTITY>
         <ENTITY ent_id="Collection">
-            <PROPERTY>id</PROPERTY>
-            <PROPERTY>userId</PROPERTY>
-            <PROPERTY>private</PROPERTY>
-            <PROPERTY>name</PROPERTY>
-            <PROPERTY>createdAt</PROPERTY>
-            <PROPERTY>updatedAt</PROPERTY>
+            <PROPERTY>id: INTEGER</PROPERTY>
+            <PROPERTY>userId: INTEGER</PROPERTY>
+            <PROPERTY>private: BOOLEAN</PROPERTY>
+            <PROPERTY>name: VARCHAR(255)</PROPERTY>
         </ENTITY>
         <ENTITY ent_id="Card">
-            <PROPERTY>id</PROPERTY>
-            <PROPERTY>name</PROPERTY>
-            <PROPERTY>material</PROPERTY>
-            <PROPERTY>collectionId</PROPERTY>
-            <PROPERTY>createdAt</PROPERTY>
-            <PROPERTY>updatedAt</PROPERTY>
+            <PROPERTY>id: INTEGER</PROPERTY>
+            <PROPERTY>name: VARCHAR(255)</PROPERTY>
+            <PROPERTY>material: TEXT</PROPERTY>
+            <PROPERTY>collectionId: INTEGER</PROPERTY>
         </ENTITY>
         <ENTITY ent_id="Editor">
-            <PROPERTY>id</PROPERTY>
-            <PROPERTY>userId</PROPERTY>
-            <PROPERTY>collectionId</PROPERTY>
-            <PROPERTY>createdAt</PROPERTY>
-            <PROPERTY>updatedAt</PROPERTY>
+            <PROPERTY>id: INTEGER</PROPERTY>
+            <PROPERTY>userId: INTEGER</PROPERTY>
+            <PROPERTY>collectionId: INTEGER</PROPERTY>
         </ENTITY>
         <RELATIONSHIP ent_ids="Collection User">
             <PROPERTY>author</PROPERTY>
@@ -78,7 +70,7 @@
             },
             Collection: {
                 id: NOT NULL PRIMARY KEY,
-                userId: NOT NULL REFERENCES User,
+                userId: NOT NULL REFERENCES User ON DELETE CASCADE,
                 private: NOT NULL,
                 name: NOT NULL,
                 createdAt: NOT NULL,
@@ -86,7 +78,7 @@
             },
             Card: {
                 id: NOT NULL PRIMARY KEY,
-                collectionId: NOT NULL REFERENCES Collection,
+                collectionId: NOT NULL REFERENCES Collection ON DELETE CASCADE,
                 name: NOT NULL,
                 material: NOT NULL,
                 createdAt: NOT NULL
@@ -94,8 +86,8 @@
             },
             Editor: {
                 id: NOT NULL PRIMARY KEY,
-                userId: NOT NULL REFERENCES User,
-                collectionId: NOT NULL REFERENCES Collection,
+                userId: NOT NULL REFERENCES User ON DELETE CASCADE,
+                collectionId: NOT NULL REFERENCES Collection ON DELETE CASCADE,
                 createdAt: NOT NULL,
                 updatedAt: NOT NULL
             }
@@ -126,7 +118,7 @@
         <DBMS>
             <TITLE>PostgreSQL</TITLE>
             <VERSION>PostgreSQL 14</VERSION>
-            <REASONING></REASONING>
+            <REASONING>PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.</REASONING>
         </DBMS>
     </TECHSPEC>
 </ISSPECS>
