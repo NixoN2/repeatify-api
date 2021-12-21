@@ -7,6 +7,7 @@ docker exec -it n-app bash
 npx sequelize-cli db:drop
 npx sequelize-cli db:create
 npx sequelize-cli db:migrate
+//запускать, если хотим создать в базе некоторые данные с самого начала
 npx sequelize-cli db:seed:all
 
 node app.js
