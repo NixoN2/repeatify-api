@@ -1,6 +1,7 @@
 module.exports = {
     get:{
         tags: ['User'],
+
         description: "Get users",
         operationId: 'getUsers',
         parameters:[],

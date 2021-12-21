@@ -19,7 +19,7 @@ const { sequelize, User, Collection, Card, Editor } = require("./models");
 const { QueryTypes } = require('sequelize');
 const swaggerUI = require("swagger-ui-express");
 const docs = require('./docs');
-
+session = require('express-session')
 const app = express();
 // app.use(passport.initialize());
 app.use(express.json());
@@ -52,7 +52,51 @@ app.use(express.json());
 //     algorithms: ['RS256']
 // });
 
+app.use(
+    session({
+        secret: 'you secret key',
+        saveUninitialized: true,
+    })
+)
+
 // app.use(jwtCheck);
+// async function basicAuth(req, res, next) {
+//     // make authenticate path public
+//     // check for basic auth header
+//     if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
+//         return res.status(401).json({ message: 'Missing Authorization Header' });
+//     }
+
+//     // verify auth credentials
+//     const base64Credentials =  req.headers.authorization.split(' ')[1];
+//     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+//     const [email, password] = credentials.split(':');
+//     const exists = await User.findOne({where: {email: email.toLowerCase()}});
+//     if (!exists) {
+//         return res.status(401).json({msg: `User with email ${email} doesn't exist`});
+//     }
+//     const validPassword = await bcrypt.compare(password, exists.password);
+//     if (!validPassword) {
+//         return res.status(403).json({ error: "Invalid Password" });
+//     }
+//     // attach user to request object
+//     req.user = exists;
+//     if (validPassword) {
+//         next();
+//     }
+// }
+async function checkUser(req,res,next) {
+    if (!req.session.user){
+        return res.status(400).json({err: "You are not signed in"});
+    }
+    return next();
+}
+async function checkAdmin(req,res,next) {
+    if (req.session.user.role !== 'admin') {
+        return res.status(400).json({err: "You are not an admin"});
+    }
+    return next();
+}
 
 app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(docs));
 
@@ -66,6 +110,7 @@ app.post("/register",async (req,res)=> {
         const salt = await bcrypt.genSalt(10);
         const new_password = await bcrypt.hash(password, salt);
         const user = await User.create({email: email.toLowerCase(),first_name,last_name,password: new_password,color,animal,role});
+        req.session.user = user;
         return res.status(201).json(user);
     } catch (err) {
         return res.status(500).json(err);
@@ -84,12 +129,13 @@ app.post("/login", async (req,res)=> {
         if (!validPassword) {
             return res.status(403).json({ error: "Invalid Password" });
         }
+        req.session.user = exists;
         return res.status(200).json(exists);
     } catch (err) {
         return res.status(500).json(err);
     }
 })
-app.get("/users", async (req,res)=> {
+app.get("/users", (req,res,next) => checkUser(req,res,next), async (req,res)=> {
     try {
         const users = await User.findAll();
         return res.status(200).json(users);
@@ -98,7 +144,7 @@ app.get("/users", async (req,res)=> {
     }
 });
 
-app.get("/users/:id",  async (req,res) => {
+app.get("/users/:id", async (req,res) => {
     const id = req.params.id;
     try {
         const user = await User.findOne({
@@ -114,7 +160,7 @@ app.get("/users/:id",  async (req,res) => {
     }
 });
 
-app.put("/users/:id",  async (req,res) => {
+app.put("/users/:id",(req,res,next) => checkUser(req,res,next),  async (req,res) => {
     const id = req.params.id;
     const {first_name, last_name, email} = req.body;
     try {
@@ -138,7 +184,7 @@ app.put("/users/:id",  async (req,res) => {
     }
 });
 
-app.delete("/users/:id", (req,res,next) => checkAdmin(req,res,next),async (req,res) => {
+app.delete("/users/:id",(req,res,next) => checkUser(req,res,next), (req,res,next) => checkAdmin(req,res,next),async (req,res) => {
     const id = req.params.id;
     try {
         const user = await User.findOne({where: {id}});
@@ -152,7 +198,7 @@ app.delete("/users/:id", (req,res,next) => checkAdmin(req,res,next),async (req,r
     }
 })
 
-app.get("/collections",async (req, res) => {
+app.get("/collections",(req,res,next) => checkUser(req,res,next), async (req, res) => {
     try {
         const collections = await Collection.findAll({include: [{
             model: User,
@@ -207,7 +253,7 @@ app.get("/collections/:id", async (req, res) => {
     }
 });
 
-app.post("/collections",async (req,res) => {
+app.post("/collections",(req,res,next) => checkUser(req,res,next), async (req,res) => {
     const {private,name, userId: id} = req.body;
     try {
         const user = await User.findOne({where: {id:id}});
@@ -221,7 +267,7 @@ app.post("/collections",async (req,res) => {
     }
 });
 
-app.delete("/collections/:id",async (req,res) => {
+app.delete("/collections/:id",(req,res,next) => checkUser(req,res,next),(req,res,next) => checkAdmin(req,res,next), async (req,res) => {
     const id = req.params.id;
     try {
         const collection = await Collection.findOne({where:{id}});
@@ -235,7 +281,7 @@ app.delete("/collections/:id",async (req,res) => {
     }
 });
 
-app.put("/collections/:id",async (req, res) => {
+app.put("/collections/:id",(req,res,next) => checkUser(req,res,next), async (req, res) => {
     const id = req.params.id;
     const {private,name} = req.body;
     try {
@@ -256,7 +302,7 @@ app.put("/collections/:id",async (req, res) => {
     }
 })
 
-app.post("/editors/:id",async (req,res) => {
+app.post("/editors/:id",(req,res,next) => checkUser(req,res,next), async (req,res) => {
     const id = req.params.id;
     const {email} = req.body;
     try {
@@ -279,7 +325,7 @@ app.post("/editors/:id",async (req,res) => {
     }
 })
 
-app.delete("/editors/:id", async (req,res) => {
+app.delete("/editors/:id",(req,res,next) => checkUser(req,res,next), async (req,res) => {
     const id = req.params.id;
     const {userId} = req.body;
     try {
@@ -303,7 +349,7 @@ app.delete("/editors/:id", async (req,res) => {
 })
 
 
-app.post("/card",async (req, res) => {
+app.post("/card",(req,res,next) => checkUser(req,res,next), async (req, res) => {
     const {collectionId, name, material} =  req.body;
     try {
         const collection = await Collection.findOne({where: {id: collectionId}});
@@ -317,7 +363,7 @@ app.post("/card",async (req, res) => {
     }
 });
 
-app.put("/card/:id", async (req, res) => {
+app.put("/card/:id",(req,res,next) => checkUser(req,res,next), async (req, res) => {
     const id = req.params.id;
     const {name, material} = req.body;
     try {
@@ -338,7 +384,7 @@ app.put("/card/:id", async (req, res) => {
     }
 });
 
-app.delete("/card/:id",async (req, res) => {
+app.delete("/card/:id",(req,res,next) => checkUser(req,res,next), async (req, res) => {
     const id = req.params.id;
     try {
         const card = await Card.findOne({where: {id}});

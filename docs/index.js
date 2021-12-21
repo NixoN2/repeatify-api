@@ -11,5 +11,5 @@ module.exports = {
     ...servers,
     ...components,
     ...tags,
-    ...routes
+    ...routes,
 };
